@@ -1,0 +1,73 @@
+/* Reset CSS */
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0e0f14;
+    color: #ffffff;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  header {
+    background-color: #120136;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  header h1 {
+    color: #ff2f92;
+    font-size: 28px;
+  }
+  
+  .main-content {
+    background-color: #28253a;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .main-content h2 {
+    color: #ffffff;
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .main-content p {
+    margin-bottom: 10px;
+  }
+  
+  form {
+    margin-bottom: 20px;
+  }
+  
+  form input[type="file"] {
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  form input[type="submit"] {
+    background-color: #ff2f92;
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  footer {
+    background-color: #1c1b2a;
+    padding: 20px;
+    text-align: center;
+    color: #ffffff;
+  }
+  
+  .footer p {
+    margin-bottom: 5px;
+  }

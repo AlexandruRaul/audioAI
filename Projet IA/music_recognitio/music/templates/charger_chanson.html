@@ -1,0 +1,35 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Music Recognition App</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Reconnaissance Musicale</h1>
+    </header>
+    <div class="container">
+        <div class="main-content">
+            <h2>Identifiez la musique en direct</h2>
+            <p>Utilisez le microphone pour enregistrer un extrait de musique et identifiez-la instantanément.</p>
+            <form id="music-form" action="{% url 'charger_chanson' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" accept="audio/*" capture="microphone" name="audio_file">
+                <input type="button" value="Identifier la chanson" onclick="redirectToIdentifier()">
+            </form>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2023 Mon Application</p>
+    </footer>
+    
+    <script>
+        function redirectToIdentifier() {
+          window.location.href = "{% url 'identifier_chanson' %}";
+        }
+    </script>
+</body>
+</html>
