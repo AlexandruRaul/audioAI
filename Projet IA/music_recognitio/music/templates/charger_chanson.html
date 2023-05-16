@@ -18,6 +18,8 @@
             <form id="music-form" action="{% url 'charger_chanson' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="file" accept="audio/*" capture="microphone" name="audio_file">
+                <a href="{% url 'identifier_chanson' %}">Identifier Chanson</a>
+
                 <input type="button" value="Identifier la chanson" onclick="redirectToIdentifier()">
             </form>
         </div>
@@ -28,6 +30,7 @@
     
     <script>
         function redirectToIdentifier() {
+
           window.location.href = "{% url 'identifier_chanson' %}";
         }
     </script>
