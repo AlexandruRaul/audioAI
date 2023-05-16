@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
-from .models import Chanson
+from music.models import Chanson
 from . import some_audio_library
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect

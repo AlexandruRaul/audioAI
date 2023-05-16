@@ -1,12 +1,12 @@
 from django.db import models
+import sqlite3
 import torch
 import torchaudio
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
-import sqlite3
-import os
+
 
 class Chanson(models.Model):
     titre = models.CharField(max_length=200)

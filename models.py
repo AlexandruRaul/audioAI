@@ -7,7 +7,8 @@ from torch.utils.data import Dataset, DataLoader
 import sqlite3
 import os
 
-# Define the CNN model
+
+# Définir le modèle CNN
 class AudioRecognitionModel(nn.Module):
     def __init__(self, num_classes):
         super(AudioRecognitionModel, self).__init__()
@@ -30,7 +31,7 @@ class AudioRecognitionModel(nn.Module):
         x = self.fc2(x)
         return x
 
-# Define a custom dataset for loading audio data from the database
+# Définir un jeu de données personnalisé pour charger les données audio depuis la base de données
 class AudioDataset(Dataset):
     def __init__(self, data, labels, transform=None):
         self.data = data
@@ -49,7 +50,7 @@ class AudioDataset(Dataset):
 
         return audio, label
 
-# Train the model
+# Entraîner le modèle
 def train_model(model, train_loader, criterion, optimizer, device, num_epochs):
     model.to(device)
 
@@ -70,7 +71,7 @@ def train_model(model, train_loader, criterion, optimizer, device, num_epochs):
 
         print(f"Epoch {epoch+1}: Loss = {running_loss / len(train_loader)}")
 
-# Test the model
+# Tester le modèle
 def test_model(model, test_loader, device):
     model.eval()
     correct = 0
@@ -90,73 +91,73 @@ def test_model(model, test_loader, device):
     accuracy = 100 * correct / total
     print(f"Test Accuracy: {accuracy}%")
 
-# Load audio data from the database
+# Charger les données audio depuis la base de données
 def load_audio_data():
     conn = sqlite3.connect('path/to/your/music_database.db')
     cursor = conn.cursor()
     
-    # Execute a query to retrieve audio data and labels from the database
+    # Exécuter une requête pour récupérer les données audio et les étiquettes de la base de données
     cursor.execute("SELECT audio, music_name, composer_name FROM audio_table")
     results = cursor.fetchall()
 
-    # Initialize lists to store the retrieved data
+    # Initialiser des listes pour stocker les données récupérées
     audio_data = []
     labels = []
 
-    # Loop through the results and extract audio data and labels
+    # Parcourir les résultats et extraire les données audio et les étiquettes
     for result in results:
         audio_path = result[0]
         music_name = result[1]
         composer_name = result[2]
 
-        # Load the audio file and preprocess it
+        # Charger le fichier audio et le prétraiter
         audio = load_and_preprocess_audio(audio_path)
         
-        # Append the preprocessed audio data to the audio_data list
+        # Ajouter les données audio prétraitées à la liste audio_data
         audio_data.append(audio)
 
-        # Create a label based on the music name and composer name
+        # Créer une étiquette basée sur le nom de la musique et le nom du compositeur
         label = f"{music_name} - {composer_name}"
         
-        # Append the label to the labels list
+        # Ajouter l'étiquette à la liste labels
         labels.append(label)
 
-    # Close the database connection
+    # Fermer la connexion à la base de données
     cursor.close()
     conn.close()
 
     return audio_data, labels
 
 
-# Preprocess the audio data
+# Prétraiter les données audio
 def load_and_preprocess_audio(audio_path):
-    # Load the audio file
+    # Charger le fichier audio
     waveform, sample_rate = torchaudio.load(audio_path)
 
-    # Apply audio preprocessing techniques
-    # Example: Convert waveform to spectrogram
+    # Appliquer des techniques de prétraitement audio
+    # Exemple : Convertir la forme d'onde en spectrogramme
     spectrogram_transform = transforms.Spectrogram()
     spectrogram = spectrogram_transform(waveform)
 
-    # Normalize the spectrogram
+    # Normaliser le spectrogramme
     normalized_spectrogram = (spectrogram - spectrogram.mean()) / spectrogram.std()
 
     return normalized_spectrogram
 
-# Main function
+# Fonction principale
 def main():
-    # Set the 
+    # Définir le périphérique (GPU si disponible, sinon CPU)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # Load audio data and labels from the database
+    # Charger les données audio et les étiquettes depuis la base de données
     audio_data, labels = load_audio_data()
 
-    # Preprocess the audio data
+    # Prétraiter les données audio
     transformed_data = []
     for audio in audio_data:
         preprocessed_audio = load_and_preprocess_audio(audio)
         transformed_data.append(preprocessed_audio)
 
-    # Split the data into training and test sets
+    # Diviser les données en ensembles d'entraînement et de test
     split_ratio = 0.8
     split_index = int(len(transformed_data) * split_ratio)
     train_data = transformed_data[:split_index]
@@ -164,29 +165,29 @@ def main():
     test_data = transformed_data[split_index:]
     test_labels = labels[split_index:]
 
-    # Create data loaders for training and test sets
+    # Créer des chargeurs de données pour les ensembles d'entraînement et de test
     transform = transforms.Compose([transforms.ToTensor()])
     train_dataset = AudioDataset(train_data, train_labels, transform=transform)
     test_dataset = AudioDataset(test_data, test_labels, transform=transform)
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
-    # Create the model
+    # Créer le modèle
     num_classes = len(set(labels))
     model = AudioRecognitionModel(num_classes)
 
-    # Define the loss function and optimizer
+    # Définir la fonction de perte et l'optimiseur
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters())
 
-    # Train the model
+    # Entraîner le modèle
     num_epochs = 10
     train_model(model, train_loader, criterion, optimizer, device, num_epochs)
 
-    # Test the model
+    # Tester le modèle
     test_model(model, test_loader, device)
 
-    # Save the model
+    # Sauvegarder le modèle
     model_path = "audio_recognition_model.pth"
     torch.save(model.state_dict(), model_path)
 
