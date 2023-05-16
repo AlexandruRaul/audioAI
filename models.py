@@ -1,8 +1,11 @@
 import torch
+import torchaudio
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
+import sqlite3
+import os
 
 # Define the CNN model
 class AudioRecognitionModel(nn.Module):
@@ -89,15 +92,56 @@ def test_model(model, test_loader, device):
 
 # Load audio data from the database
 def load_audio_data():
-    # Replace this with your code to load audio data from the database
-    # Return the audio data and corresponding labels
-    pass
+    conn = sqlite3.connect('path/to/your/music_database.db')
+    cursor = conn.cursor()
+    
+    # Execute a query to retrieve audio data and labels from the database
+    cursor.execute("SELECT audio, music_name, composer_name FROM audio_table")
+    results = cursor.fetchall()
+
+    # Initialize lists to store the retrieved data
+    audio_data = []
+    labels = []
+
+    # Loop through the results and extract audio data and labels
+    for result in results:
+        audio_path = result[0]
+        music_name = result[1]
+        composer_name = result[2]
+
+        # Load the audio file and preprocess it
+        audio = load_and_preprocess_audio(audio_path)
+        
+        # Append the preprocessed audio data to the audio_data list
+        audio_data.append(audio)
+
+        # Create a label based on the music name and composer name
+        label = f"{music_name} - {composer_name}"
+        
+        # Append the label to the labels list
+        labels.append(label)
+
+    # Close the database connection
+    cursor.close()
+    conn.close()
+
+    return audio_data, labels
+
 
 # Preprocess the audio data
-def preprocess_audio(audio):
-    # Replace this with your audio preprocessing code (e.g., spectrogram conversion)
-    # Return the preprocessed audio data
-    pass
+def load_and_preprocess_audio(audio_path):
+    # Load the audio file
+    waveform, sample_rate = torchaudio.load(audio_path)
+
+    # Apply audio preprocessing techniques
+    # Example: Convert waveform to spectrogram
+    spectrogram_transform = transforms.Spectrogram()
+    spectrogram = spectrogram_transform(waveform)
+
+    # Normalize the spectrogram
+    normalized_spectrogram = (spectrogram - spectrogram.mean()) / spectrogram.std()
+
+    return normalized_spectrogram
 
 # Main function
 def main():
@@ -109,7 +153,7 @@ def main():
     # Preprocess the audio data
     transformed_data = []
     for audio in audio_data:
-        preprocessed_audio = preprocess_audio(audio)
+        preprocessed_audio = load_and_preprocess_audio(audio)
         transformed_data.append(preprocessed_audio)
 
     # Split the data into training and test sets
