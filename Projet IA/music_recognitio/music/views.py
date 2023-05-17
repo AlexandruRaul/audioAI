@@ -1,65 +1,32 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseBadRequest, Http404
-from music.models import Chanson
-from . import some_audio_library
-from django.contrib.auth import authenticate, login
-from django.shortcuts import redirect
-from .forms import LoginForm
-from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
-from .models import AudioRecognitionModel  # Import the AudioRecognitionModel class
+from django.shortcuts import render
+from django.core.files.storage import FileSystemStorage
+from .models import Chanson
+from .models import File
+import magic
+import os
+from django.conf import settings
 
-
-
-def charger_chanson(request):
-    # logique pour charger une chanson ici
-    return render(request, 'charger_chanson.html')
-
-def identifier_chanson(request):
+def index(request):
     if request.method == 'POST':
-        try:
-            # Tentez de récupérer la chanson du formulaire
-            chanson_id = request.POST['chanson_id']
-            chanson = get_object_or_404(Chanson, pk=chanson_id)
+        file = request.FILES['file']
+        fs = FileSystemStorage()
+        filename = fs.save(file.name, file)
+        uploaded_file_url = fs.path(filename)
 
-            # Tentez d'identifier la chanson
-            audio_file = request.FILES['audio_file']
-            identified_song = some_audio_library.identify_song(audio_file)
+        # vérifiez que le fichier téléchargé est un fichier audio
+        file_type = magic.from_file(uploaded_file_url, mime=True)
+        if "audio" not in file_type:
+            os.remove(uploaded_file_url)  # supprime le fichier s'il n'est pas audio
+            return render(request, 'erreur.html', {'message': "Le fichier téléchargé n'est pas un fichier audio."})
 
-            # Si tout se passe bien, retournez la chanson identifiée
-            return HttpResponse(f'Chanson identifiée : {identified_song}')
-
-        except KeyError:
-            # Si 'chanson_id' ou 'audio_file' n'est pas dans le formulaire, retournez une erreur 400
-            return HttpResponseBadRequest('Requête mal formée : chanson_id ou audio_file manquant')
-
-        except Chanson.DoesNotExist:
-            # Si la chanson n'existe pas, retournez une erreur 404
-            raise Http404('Chanson non trouvée')
-
-        except some_audio_library.AudioFormatError:
-            # Si le fichier audio est mal formaté, retournez une erreur 400
-            return HttpResponseBadRequest('Fichier audio mal formaté')
-
+        # ici vous pouvez ajouter la logique de votre algorithme de reconnaissance de musique 
+        # pour l'instant, nous supposons simplement que la chanson a été reconnue avec succès
+        song_name = "Nom de la chanson"
+        artist_name = "Nom de l'artiste"
+        
+        if song_name and artist_name:
+            return render(request, 'resultats.html', {'song_name': song_name, 'artist_name': artist_name})
+        else:
+            return render(request, 'erreur.html', {'message': "La chanson n'a pas pu être reconnue."})
     else:
-        return HttpResponseBadRequest('Méthode non autorisée')
-    
-def login_view(request):
-    if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = LoginForm()
-    return render(request, 'login.html', {'form': form})
-
-def logout_view(request):
-    logout(request)
-    return redirect('login')
-
-@login_required
-def protected_view(request):
-    # Cette vue nécessite une authentification
-    pass
+        return render(request, 'index.html')
