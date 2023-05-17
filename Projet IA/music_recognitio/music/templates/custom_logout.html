@@ -1,0 +1,19 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/identifier.css' %}">
+    <title>Déconnexion</title>
+</head>
+<body>
+    <!-- custom-logout.html -->
+    <h1>Déconnexion</h1>
+
+    <p>Vous êtes maintenant déconnecté.</p>
+    <a href="{% url 'music:identifier_chanson' %}">Retourner à l'identification de chanson</a>
+</body>
+</html>

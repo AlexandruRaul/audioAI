@@ -7,10 +7,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{% static 'css/identifier.css' %}">
-    <title>chanson_identifiee</title>
+    <title>Chanson Identifiée</title>
 </head>
 <body>
-    <!-- identifier_chanson.html -->
-<p>Chanson identifiée : {{ chanson_identifiee }}</p>
+    <p>Chanson identifiée : {{ chanson_identifiee }}</p>
+
+    {# Link to the identification page #}
+    <a href="{% url 'music:identifier_chanson' %}">Lien vers l'identification de chanson</a>
+	
+    <form method="post" action="{% url 'music:identifier_chanson' %}">
+        {% csrf_token %}
+        <label for="artist_name">Nom de l'artiste :</label>
+        <input type="text" id="artist_name" name="artist_name"><br>
+
+        <label for="song_name">Nom de la chanson :</label>
+        <input type="text" id="song_name" name="song_name"><br>
+
+        <input type="submit" value="Identifier Chanson">
+    </form>
 </body>
 </html>
